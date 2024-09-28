@@ -1,0 +1,96 @@
+@page "/todo"
+
+<h3>Todo siden</h3>
+
+@*Inputfelt som finder data toveis melolom komponent og C# field newTodo*@
+
+<input @bind="newTodo" class="form-control" placeholder="enter a new todo....."@onkeydown="HandleEnter"/>
+<button @onclick="AddTodo">Add todo</button>
+
+@*Å lage en liste over todos/gjøremål*@
+
+<ul class="list-group">
+    @foreach(var todo in todos)
+    {
+        <li class="list-group-item d-flex justify-content-between aling-items-center">
+            <span style="text-decoration: @(todo.isComplited ? "line-through" : "none");">
+                @todo.Title
+            </span>
+            <div>
+                <button class="btn btn-success btn-sm" @onclick = "() => ToggleComplete(todo)">
+                    @(todo.isComplited ? "Undo" : "Complete")
+                </button>
+                <button class= "btn btn-danger btn-sm" @onclick="() => DeleteTodo(todo)">Delete</button>
+            </div>
+        </li> 
+    }
+</ul>
+
+
+@code{
+
+    private string newTodo = string.Empty;
+    private List<TodoItem> todos = new();
+
+#region Livssyklus i blazor 
+protected override void OnInitialized()
+{
+    Console.WriteLine("On initialized");
+    base.OnInitialized();
+}
+
+protected override void OnAfterRender(bool firstRender)
+    {
+        if(firstRender)
+        {
+            Console.WriteLine("First Render!");
+        }
+    }
+
+public void  Dispose()
+{
+    Console.WriteLine("DISPOSEE!");
+}
+
+#endregion
+
+
+
+
+
+    private void AddTodo()
+    {
+        Console.WriteLine("Add TODO CALLED!!");
+        if(!string.IsNullOrEmpty(newTodo))
+        {
+            todos.Add(new TodoItem{Title=newTodo});
+            newTodo = string.Empty;
+        }
+    }  
+    private void ToggleComplete(TodoItem todo)
+    {
+        todo.isComplited = !todo.isComplited;
+    }
+
+    private void DeleteTodo(TodoItem todo)
+    {
+        todos.Remove(todo);
+    }
+
+
+    public void HandleEnter(KeyboardEventArgs e)
+    {
+        if(e.Key =="Enter")
+        {
+            AddTodo();
+        }
+
+    }
+
+    private class TodoItem
+    {
+        public string Title {get; set;} = string.Empty;
+        public bool isComplited {get; set;} = false;
+
+    }
+}
